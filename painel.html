@@ -11,7 +11,7 @@
     <div class="container">
         <h1>Painel de Chamados - TI</h1>
         
-        <!-- O aviso instantâneo ficará escondido aqui -->
+        <!-- Aviso instantâneo -->
         <div id="alerta-novo-chamado" style="display: none; background-color: #ffeb3b; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 20px;">
             🔔 Novo chamado recebido!
         </div>
@@ -19,18 +19,11 @@
         <!-- Lista onde os chamados vão aparecer -->
         <h2>Chamados Abertos</h2>
         <div id="lista-chamados">
-            <!-- O JavaScript vai inserir os chamados aqui dentro no formato abaixo:
-                 <div class="chamado">
-                     <strong>Nome:</strong> João <br>
-                     <strong>Problema:</strong> Computador não liga
-                 </div>
-            -->
             <p>Nenhum chamado no momento. Aguardando...</p>
         </div>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <!-- Importação do Socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- Importação única do Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
@@ -38,36 +31,60 @@
         const alerta = document.getElementById('alerta-novo-chamado');
         let primeiroChamado = true;
 
+        // Cria o contexto de áudio
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // Desbloqueia o áudio no primeiro clique do usuário em qualquer lugar da tela
+        document.addEventListener('click', () => {
+            getAudioContext();
+        }, { once: true });
+
+        // Função para emitir o som de notificação
         function tocarSomNotificacao() {
             try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const audioCtx = new AudioContext();
+                const ctx = getAudioContext();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
 
-                const osc1 = audioCtx.createOscillator();
-                const gain1 = audioCtx.createGain();
+                const agora = ctx.currentTime;
+
+                // Tom 1 (Grave/Médio)
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
                 osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-                gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc1.frequency.setValueAtTime(587.33, agora);
+                gain1.gain.setValueAtTime(0.3, agora);
+                gain1.gain.exponentialRampToValueAtTime(0.01, agora + 0.15);
                 osc1.connect(gain1);
-                gain1.connect(audioCtx.destination);
-                osc1.start();
-                osc1.stop(audioCtx.currentTime + 0.2);
+                gain1.connect(ctx.destination);
+                osc1.start(agora);
+                osc1.stop(agora + 0.15);
 
-                setTimeout(() => {
-                    const osc2 = audioCtx.createOscillator();
-                    const gain2 = audioCtx.createGain();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime);
-                    gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    osc2.start();
-                    osc2.stop(audioCtx.currentTime + 0.3);
-                }, 150);
+                // Tom 2 (Agudo)
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(880, agora + 0.15);
+                gain2.gain.setValueAtTime(0.3, agora + 0.15);
+                gain2.gain.exponentialRampToValueAtTime(0.01, agora + 0.35);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(agora + 0.15);
+                osc2.stop(agora + 0.35);
             } catch (e) {
-                console.log('Reprodução de áudio bloqueada ou não suportada:', e);
+                console.warn('Erro ao tocar som:', e);
             }
         }
 
@@ -101,7 +118,7 @@
             const btnConcluir = card.querySelector('.btn-concluir');
             btnConcluir.addEventListener('click', () => {
                 card.classList.add('finalizado');
-                btnConcluir.remove(); // Remove o botão
+                btnConcluir.remove();
 
                 const badge = document.createElement('span');
                 badge.className = 'badge-concluido';
@@ -112,10 +129,5 @@
             listaChamados.prepend(card);
         });
     </script>
-</body>
-</html>
-</body>
-</html>
-</body>
 </body>
 </html>
