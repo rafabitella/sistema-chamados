@@ -11,19 +11,16 @@
     <div class="container">
         <h1>Painel de Chamados - TI</h1>
         
-        <!-- Aviso instantâneo -->
         <div id="alerta-novo-chamado" style="display: none; background-color: #ffeb3b; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 20px;">
             🔔 Novo chamado recebido!
         </div>
 
-        <!-- Lista onde os chamados vão aparecer -->
-        <h2>Chamados Abertos</h2>
+        <h2>Chamados Recebidos</h2>
         <div id="lista-chamados">
             <p>Nenhum chamado no momento. Aguardando...</p>
         </div>
     </div>
 
-    <!-- Importação única do Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
@@ -31,7 +28,6 @@
         const alerta = document.getElementById('alerta-novo-chamado');
         let primeiroChamado = true;
 
-        // Cria o contexto de áudio
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
 
@@ -45,22 +41,16 @@
             return audioCtx;
         }
 
-        // Desbloqueia o áudio no primeiro clique do usuário em qualquer lugar da tela
         document.addEventListener('click', () => {
             getAudioContext();
         }, { once: true });
 
-        // Função para emitir o som de notificação
         function tocarSomNotificacao() {
             try {
                 const ctx = getAudioContext();
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
+                if (ctx.state === 'suspended') ctx.resume();
 
                 const agora = ctx.currentTime;
-
-                // Tom 1 (Grave/Médio)
                 const osc1 = ctx.createOscillator();
                 const gain1 = ctx.createGain();
                 osc1.type = 'sine';
@@ -72,17 +62,18 @@
                 osc1.start(agora);
                 osc1.stop(agora + 0.15);
 
-                // Tom 2 (Agudo)
-                const osc2 = ctx.createOscillator();
-                const gain2 = ctx.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(880, agora + 0.15);
-                gain2.gain.setValueAtTime(0.3, agora + 0.15);
-                gain2.gain.exponentialRampToValueAtTime(0.01, agora + 0.35);
-                osc2.connect(gain2);
-                gain2.connect(ctx.destination);
-                osc2.start(agora + 0.15);
-                osc2.stop(agora + 0.35);
+                setTimeout(() => {
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, agora + 0.15);
+                    gain2.gain.setValueAtTime(0.3, agora + 0.15);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, agora + 0.35);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(agora + 0.15);
+                    osc2.stop(agora + 0.35);
+                }, 150);
             } catch (e) {
                 console.warn('Erro ao tocar som:', e);
             }
@@ -101,29 +92,44 @@
                 alerta.style.display = 'none';
             }, 5000);
 
-            // Cria o card do chamado
             const card = document.createElement('div');
             card.className = 'chamado';
+            card.id = chamado.id;
             card.innerHTML = `
                 <div class="conteudo-chamado">
                     <p><strong>Horário:</strong> ${chamado.hora}</p>
                     <p><strong>Nome:</strong> ${chamado.nome}</p>
                     <p><strong>Setor:</strong> ${chamado.setor}</p>
                     <p><strong>Problema:</strong> ${chamado.descricao}</p>
+                    <div><span class="badge badge-pendente">Aguardando Suporte</span></div>
                 </div>
-                <button class="btn-concluir">Concluir Atendimento</button>
+                <div class="acoes-chamado">
+                    <button class="btn-atender">Atender Chamado</button>
+                    <button class="btn-concluir">Finalizar Chamado</button>
+                </div>
             `;
 
-            // Ação ao clicar no botão "Concluir"
+            const btnAtender = card.querySelector('.btn-atender');
             const btnConcluir = card.querySelector('.btn-concluir');
-            btnConcluir.addEventListener('click', () => {
-                card.classList.add('finalizado');
-                btnConcluir.remove();
+            const badge = card.querySelector('.badge');
 
-                const badge = document.createElement('span');
-                badge.className = 'badge-concluido';
+            // Quando o TI clica em "Atender"
+            btnAtender.addEventListener('click', () => {
+                badge.className = 'badge badge-analise';
+                badge.textContent = 'Em Análise';
+                btnAtender.remove(); // Remove o botão de atender, mantém só o de finalizar
+
+                socket.emit('atualizar_status', { id: chamado.id, status: 'em_analise' });
+            });
+
+            // Quando o TI clica em "Finalizar"
+            btnConcluir.addEventListener('click', () => {
+                badge.className = 'badge badge-concluido';
                 badge.textContent = 'Resolvido';
-                card.appendChild(badge);
+                card.classList.add('finalizado');
+                card.querySelector('.acoes-chamado').remove(); // Remove todos os botões
+
+                socket.emit('atualizar_status', { id: chamado.id, status: 'concluido' });
             });
 
             listaChamados.prepend(card);

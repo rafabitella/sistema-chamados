@@ -14,36 +14,55 @@
 
         <!-- Formulário -->
         <form id="form-chamado">
-            <label for="nome">Seu Nome:</label><br>
-            <input type="text" id="nome" placeholder="Ex: Ivan Carlos" required><br><br>
+            <label for="nome">Seu Nome:</label>
+            <input type="text" id="nome" placeholder="Ex: Ivan Carlos" required>
 
-            <label for="setor">Seu Setor:</label><br>
-            <input type="text" id="setor" placeholder="Ex: Administrativo" required><br><br>
+            <label for="setor">Seu Setor:</label>
+            <input type="text" id="setor" placeholder="Ex: Administrativo" required>
 
-            <label for="descricao">Descrição do Problema:</label><br>
-            <textarea id="descricao" rows="4" placeholder="Descreva o que está acontecendo..." required></textarea><br><br>
+            <label for="descricao">Descrição do Problema:</label>
+            <textarea id="descricao" rows="4" placeholder="Descreva o que está acontecendo..." required></textarea>
 
             <button type="submit">Enviar Chamado</button>
         </form>
 
-        <!-- Mensagem de sucesso que ficará escondida inicialmente -->
-        <div id="mensagem-sucesso" style="display: none; color: green; margin-top: 15px;">
-            Chamado enviado com sucesso!
+        <!-- Acompanhamento em tempo real para o usuário -->
+        <div id="status-container" style="display: none;">
+            <div id="card-acompanhamento" class="card-status">
+                <h3 style="margin-bottom: 8px; font-size: 16px;">Status do seu Chamado:</h3>
+                <p id="texto-status" style="margin-bottom: 5px; font-weight: bold; color: #856404;">
+                    ⏳ Aguardando atendimento pelo suporte...
+                </p>
+                <p id="detalhe-status" style="font-size: 13px; color: #666; margin-bottom: 0;">
+                    Seu chamado foi registrado e já está na fila da equipe de TI.
+                </p>
+            </div>
         </div>
     </div>
+
     <div class="rodape">
         &copy; 2026 - Desenvolvido por Rafael Bitella
     </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         const form = document.getElementById('form-chamado');
-        const msgSucesso = document.getElementById('mensagem-sucesso');
+        const statusContainer = document.getElementById('status-container');
+        const cardStatus = document.getElementById('card-acompanhamento');
+        const textoStatus = document.getElementById('texto-status');
+        const detalheStatus = document.getElementById('detalhe-status');
+
+        let meuChamadoId = null;
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
+            // Gera ID único para identificar o chamado
+            meuChamadoId = 'chamado_' + Date.now();
+
             const chamado = {
+                id: meuChamadoId,
                 nome: document.getElementById('nome').value,
                 setor: document.getElementById('setor').value,
                 descricao: document.getElementById('descricao').value,
@@ -52,13 +71,27 @@
 
             socket.emit('novo_chamado', chamado);
 
-            form.reset();
-            msgSucesso.style.display = 'block';
-            setTimeout(() => {
-                msgSucesso.style.display = 'none';
-            }, 4000);
+            // Esconde o formulário e mostra o cartão de status
+            form.style.display = 'none';
+            statusContainer.style.display = 'block';
+        });
+
+        // Escuta atualizações de status vindas do TI
+        socket.on('status_alterado', (dados) => {
+            if (dados.id === meuChamadoId) {
+                if (dados.status === 'em_analise') {
+                    cardStatus.className = 'card-status em-analise';
+                    textoStatus.style.color = '#004085';
+                    textoStatus.innerHTML = '🔍 Seu chamado está em análise!';
+                    detalheStatus.innerHTML = 'Um técnico do TI assumiu a sua solicitação e já está trabalhando na solução.';
+                } else if (dados.status === 'concluido') {
+                    cardStatus.className = 'card-status concluido';
+                    textoStatus.style.color = '#155724';
+                    textoStatus.innerHTML = '✅ Chamado encerrado!';
+                    detalheStatus.innerHTML = 'O suporte finalizou o atendimento deste chamado. Obrigado!';
+                }
+            }
         });
     </script>
-</body>
 </body>
 </html>

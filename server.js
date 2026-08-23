@@ -7,10 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Serve arquivos estáticos da pasta raiz
 app.use(express.static(path.join(__dirname)));
 
-// Rotas explícitas para garantir o acesso direto
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -24,8 +22,14 @@ app.get('/painel.html', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+    // Quando o usuário envia um novo chamado
     socket.on('novo_chamado', (dados) => {
         io.emit('receber_chamado', dados);
+    });
+
+    // Quando o TI atualiza o status (em analise ou finalizado)
+    socket.on('atualizar_status', (dados) => {
+        io.emit('status_alterado', dados);
     });
 });
 

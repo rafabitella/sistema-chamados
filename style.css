@@ -161,3 +161,90 @@ button:hover {
     margin-top: 8px;
     font-weight: bold;
 }
+
+/* Botões de Ação do Suporte */
+.acoes-chamado {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.btn-atender {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    width: auto;
+    transition: background-color 0.2s;
+}
+
+.btn-atender:hover {
+    background-color: #e68a00;
+}
+
+.btn-concluir {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    width: auto;
+    transition: background-color 0.2s;
+}
+
+.btn-concluir:hover {
+    background-color: #218838;
+}
+
+/* Badges de Status */
+.badge {
+    display: inline-block;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.badge-pendente {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.badge-analise {
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
+.badge-concluido {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Painel de Acompanhamento do Usuário (index.html) */
+.card-status {
+    border-left: 5px solid #1a73e8;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.card-status.em-analise {
+    border-left-color: #ff9800;
+}
+
+.card-status.concluido {
+    border-left-color: #28a745;
+}
