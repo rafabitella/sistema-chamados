@@ -29,23 +29,66 @@
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
+    <!-- Importação do Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         const listaChamados = document.getElementById('lista-chamados');
         const alerta = document.getElementById('alerta-novo-chamado');
         let primeiroChamado = true;
 
+        // Função que gera um som de notificação (beep suave duplo)
+        function tocarSomNotificacao() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+
+                // Primeiro tom
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Tom D5
+                gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.2);
+
+                // Segundo tom (mais agudo)
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, audioCtx.currentTime); // Tom A5
+                    gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.3);
+                }, 150);
+            } catch (e) {
+                console.log('Reprodução de áudio bloqueada ou não suportada:', e);
+            }
+        }
+
         socket.on('receber_chamado', (chamado) => {
+            // Toca o alerta sonoro instantaneamente
+            tocarSomNotificacao();
+
             if (primeiroChamado) {
                 listaChamados.innerHTML = '';
                 primeiroChamado = false;
             }
 
+            // Exibe o alerta visual no topo
             alerta.style.display = 'block';
             setTimeout(() => {
                 alerta.style.display = 'none';
             }, 5000);
 
+            // Cria o card do chamado
             const card = document.createElement('div');
             card.className = 'chamado';
             card.innerHTML = `
@@ -58,6 +101,8 @@
             listaChamados.prepend(card);
         });
     </script>
+</body>
+</html>
 </body>
 </body>
 </html>
