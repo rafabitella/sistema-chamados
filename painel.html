@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Chamados (Admin)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Painel de Chamados - TI</h1>
+        
+        <!-- O aviso instantâneo ficará escondido aqui -->
+        <div id="alerta-novo-chamado" style="display: none; background-color: #ffeb3b; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 20px;">
+            🔔 Novo chamado recebido!
+        </div>
+
+        <!-- Lista onde os chamados vão aparecer -->
+        <h2>Chamados Abertos</h2>
+        <div id="lista-chamados">
+            <!-- O JavaScript vai inserir os chamados aqui dentro no formato abaixo:
+                 <div class="chamado">
+                     <strong>Nome:</strong> João <br>
+                     <strong>Problema:</strong> Computador não liga
+                 </div>
+            -->
+            <p>Nenhum chamado no momento. Aguardando...</p>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const listaChamados = document.getElementById('lista-chamados');
+        const alerta = document.getElementById('alerta-novo-chamado');
+        let primeiroChamado = true;
+
+        socket.on('receber_chamado', (chamado) => {
+            if (primeiroChamado) {
+                listaChamados.innerHTML = '';
+                primeiroChamado = false;
+            }
+
+            alerta.style.display = 'block';
+            setTimeout(() => {
+                alerta.style.display = 'none';
+            }, 5000);
+
+            const card = document.createElement('div');
+            card.className = 'chamado';
+            card.innerHTML = `
+                <p><strong>Horário:</strong> ${chamado.hora}</p>
+                <p><strong>Nome:</strong> ${chamado.nome}</p>
+                <p><strong>Setor:</strong> ${chamado.setor}</p>
+                <p><strong>Problema:</strong> ${chamado.descricao}</p>
+            `;
+
+            listaChamados.prepend(card);
+        });
+    </script>
+</body>
+</body>
+</html>

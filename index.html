@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abertura de Chamado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>CHAMADOS GRUPO LE VITTA</h1>
+        <p>Preencha os dados abaixo para solicitar suporte.</p>
+
+        <!-- Formulário -->
+        <form id="form-chamado">
+            <label for="nome">Seu Nome:</label><br>
+            <input type="text" id="nome" placeholder="Ex: Ivan Carlos" required><br><br>
+
+            <label for="setor">Seu Setor:</label><br>
+            <input type="text" id="setor" placeholder="Ex: Administrativo" required><br><br>
+
+            <label for="descricao">Descrição do Problema:</label><br>
+            <textarea id="descricao" rows="4" placeholder="Descreva o que está acontecendo..." required></textarea><br><br>
+
+            <button type="submit">Enviar Chamado</button>
+        </form>
+
+        <!-- Mensagem de sucesso que ficará escondida inicialmente -->
+        <div id="mensagem-sucesso" style="display: none; color: green; margin-top: 15px;">
+            Chamado enviado com sucesso!
+        </div>
+    </div>
+    <div class="rodape">
+        &copy; 2026 - Desenvolvido por Rafael Bitella
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const form = document.getElementById('form-chamado');
+        const msgSucesso = document.getElementById('mensagem-sucesso');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const chamado = {
+                nome: document.getElementById('nome').value,
+                setor: document.getElementById('setor').value,
+                descricao: document.getElementById('descricao').value,
+                hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            socket.emit('novo_chamado', chamado);
+
+            form.reset();
+            msgSucesso.style.display = 'block';
+            setTimeout(() => {
+                msgSucesso.style.display = 'none';
+            }, 4000);
+        });
+    </script>
+</body>
+</body>
+</html>
