@@ -121,3 +121,43 @@ button:hover {
     font-size: 12px;
     color: #999;
 }
+/* Botão e estado de Chamado Concluído */
+.btn-concluir {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+    width: auto; /* Não ocupa a largura toda como o botão do form */
+}
+
+.btn-concluir:hover {
+    background-color: #218838;
+}
+
+.chamado.finalizado {
+    border-left-color: #6c757d;
+    background-color: #f1f3f5;
+    opacity: 0.7;
+}
+
+.chamado.finalizado p {
+    text-decoration: line-through;
+    color: #777;
+}
+
+.badge-concluido {
+    display: inline-block;
+    background-color: #6c757d;
+    color: white;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-top: 8px;
+    font-weight: bold;
+}
