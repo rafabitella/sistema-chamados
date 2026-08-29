@@ -1,11 +1,11 @@
-const CACHE_NAME = 'levitta-ti-v3';
+const CACHE_NAME = 'levitta-ti-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/painel.html',
   '/style.css',
   '/manifest.json',
-  '/imagens/favicon.png'
+  '/SITE CHAMADO/favicon.png'
 ];
 
 self.addEventListener('install', (event) => {
