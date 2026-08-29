@@ -1,21 +1,20 @@
-const CACHE_NAME = 'levitta-ti-v1';
+const CACHE_NAME = 'levitta-ti-v3';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
+  '/painel.html',
   '/style.css',
-  '/manifest.json'
+  '/manifest.json',
+  '/imagens/favicon.png'
 ];
 
-// Instalação do Service Worker
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
 });
 
-// Ativação e limpeza de caches antigos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -26,11 +25,10 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Interceptação de requisições
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
