@@ -3,59 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abertura de Chamado</title>
+    <title>Central de Suporte - Grupo Le Vitta</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>CHAMADOS GRUPO LE VITTA</h1>
-        <p id="subtitulo">Preencha os dados abaixo para solicitar suporte.</p>
+        <div class="header-area">
+            <img src="imagens/levitta.png" alt="Grupo Le Vitta" class="header-logo" onerror="this.style.display='none'">
+            <h1>Central de Ajuda TI</h1>
+            <p id="subtitulo">Abra seu chamado preenchendo os dados abaixo</p>
+        </div>
 
         <!-- Formulário de Abertura -->
         <form id="form-chamado">
-            <label for="nome">Seu Nome:</label>
-            <input type="text" id="nome" placeholder="Ex: Ivan Carlos" required>
+            <div class="form-group">
+                <label for="nome">Seu Nome Completo</label>
+                <div class="input-icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <input type="text" id="nome" placeholder="Ex: Ivan Carlos" required>
+                </div>
+            </div>
 
-            <label for="setor">Seu Setor:</label>
-            <input type="text" id="setor" placeholder="Ex: Administrativo" required>
+            <div class="form-group">
+                <label for="setor">Seu Setor / Departamento</label>
+                <div class="input-icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    <input type="text" id="setor" placeholder="Ex: Financeiro, RH, Operações..." required>
+                </div>
+            </div>
 
-            <label for="descricao">Descrição do Problema:</label>
-            <textarea id="descricao" rows="4" placeholder="Descreva o que está acontecendo..." required></textarea>
+            <div class="form-group">
+                <label for="descricao">Descrição da Solicitação / Problema</label>
+                <textarea id="descricao" placeholder="Explique brevemente o que está ocorrendo..." required></textarea>
+            </div>
 
-            <button type="submit">Enviar Chamado</button>
+            <button type="submit" class="btn-primary">Enviar Chamado</button>
         </form>
 
-        <!-- Painel de Acompanhamento do Usuário -->
+        <!-- Acompanhamento em Tempo Real -->
         <div id="status-container" style="display: none;">
             <div class="status-timeline">
-                <div id="step-1" class="timeline-step ativo">1. Aguardando</div>
-                <div id="step-2" class="timeline-step">2. Em Análise</div>
+                <div id="step-1" class="timeline-step ativo">1. Fila</div>
+                <div id="step-2" class="timeline-step">2. Em Atendimento</div>
                 <div id="step-3" class="timeline-step">3. Concluído</div>
             </div>
 
             <div id="card-acompanhamento" class="card-status">
-                <h3 style="margin-bottom: 8px; font-size: 16px;">Status do seu Chamado:</h3>
-                <p id="texto-status" style="margin-bottom: 5px; font-weight: bold; color: #856404; font-size: 15px;">
+                <h3 style="margin-bottom: 4px; font-size: 15px;">Status da Solicitação</h3>
+                <p id="texto-status" style="margin-bottom: 4px; font-weight: 700; color: var(--warning); font-size: 14.5px;">
                     ⏳ Aguardando atendimento pelo suporte...
                 </p>
-                <p id="detalhe-status" style="font-size: 13px; color: #666; margin-bottom: 0;">
-                    Seu chamado foi registrado com sucesso e está na fila da equipe de TI.
+                <p id="detalhe-status" style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 0;">
+                    Seu chamado já está registrado na fila da equipe de TI.
                 </p>
             </div>
 
-            <!-- Chat em Tempo Real -->
+            <!-- Chat -->
             <div class="chat-container">
                 <div class="chat-mensagens" id="chat-mensagens"></div>
                 <form class="chat-form" id="chat-form">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Digite uma mensagem para o suporte..." required autocomplete="off">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Mensagem para o suporte..." required autocomplete="off">
                     <button type="submit" class="btn-enviar-chat">Enviar</button>
                 </form>
             </div>
 
-            <!-- Box de Avaliação (surge após conclusão) -->
+            <!-- Avaliação -->
             <div id="box-avaliacao" class="avaliacao-box" style="display: none;">
-                <h4>Como você avalia este atendimento?</h4>
+                <h4 style="font-size: 15px; color: var(--text-main); margin-bottom: 4px;">Como foi o seu atendimento?</h4>
+                <p style="font-size: 12.5px; color: var(--text-muted);">Sua nota nos ajuda a melhorar os serviços.</p>
                 <form id="form-avaliacao">
                     <div class="estrelas-rating">
                         <input type="radio" id="estrela5" name="rating" value="5" required><label for="estrela5">★</label>
@@ -64,11 +80,13 @@
                         <input type="radio" id="estrela2" name="rating" value="2"><label for="estrela2">★</label>
                         <input type="radio" id="estrela1" name="rating" value="1"><label for="estrela1">★</label>
                     </div>
-                    <textarea id="comentario-avaliacao" rows="2" placeholder="Deixe um comentário sobre o atendimento (opcional)..."></textarea>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <textarea id="comentario-avaliacao" placeholder="Deixe um comentário adicional (opcional)..." style="min-height: 70px;"></textarea>
+                    </div>
                     <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
                 </form>
-                <p id="msg-avaliacao-enviada" style="display: none; color: #28a745; font-weight: bold; margin-top: 10px;">
-                    Obrigado pelo seu feedback! ⭐
+                <p id="msg-avaliacao-enviada" style="display: none; color: var(--success); font-weight: 700; margin-top: 12px; font-size: 13.5px;">
+                    Obrigado pela sua avaliação! ⭐
                 </p>
             </div>
 
@@ -77,7 +95,7 @@
     </div>
 
     <div class="rodape">
-        &copy; 2026 - Desenvolvido por Rafael Bitella
+        &copy; 2026 Grupo Le Vitta &bull; Desenvolvido por Rafael Bitella
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -94,12 +112,10 @@
         const step3 = document.getElementById('step-3');
         const btnVoltar = document.getElementById('btn-voltar');
 
-        // Chat
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
         const chatMensagens = document.getElementById('chat-mensagens');
 
-        // Avaliação
         const boxAvaliacao = document.getElementById('box-avaliacao');
         const formAvaliacao = document.getElementById('form-avaliacao');
         const msgAvaliacaoEnviada = document.getElementById('msg-avaliacao-enviada');
@@ -124,12 +140,12 @@
             socket.emit('novo_chamado', chamado);
 
             form.style.display = 'none';
-            subtitulo.textContent = 'Acompanhe o andamento da sua solicitação abaixo:';
+            subtitulo.textContent = 'Acompanhe o andamento da sua solicitação em tempo real';
             statusContainer.style.display = 'block';
 
             adicionarMensagemChat({
                 autor: 'Sistema',
-                texto: 'Chat aberto. Envie mais detalhes ou dúvidas aqui.',
+                texto: 'Chat iniciado. Você pode tirar dúvidas ou enviar mais informações por aqui.',
                 hora: chamado.hora,
                 tipo: 'msg-suporte'
             });
@@ -153,7 +169,7 @@
         });
 
         socket.on('nova_mensagem', (msg) => {
-            if (msg.chamadoId === meuChamadoId) {
+            if (msg.chamadoId === meuChamadoId || msg.chamado_id === meuChamadoId) {
                 const tipoClasse = msg.tipoOrigem === 'usuario' ? 'msg-usuario' : 'msg-suporte';
                 adicionarMensagemChat({
                     autor: msg.autor,
@@ -184,42 +200,36 @@
                     step3.className = 'timeline-step';
 
                     cardStatus.className = 'card-status em-analise';
-                    textoStatus.style.color = '#ff9800';
-                    textoStatus.innerHTML = '⚙️ Chamado em andamento!';
-                    detalheStatus.innerHTML = 'A equipe de TI já assumiu seu chamado e está realizando o atendimento.';
+                    textoStatus.style.color = '#0f52ba';
+                    textoStatus.innerHTML = '⚙️ Chamado em atendimento!';
+                    detalheStatus.innerHTML = 'A equipe de TI já assumiu seu chamado e está atuando na resolução.';
                 } else if (dados.status === 'concluido') {
                     step1.className = 'timeline-step concluido';
                     step2.className = 'timeline-step concluido';
                     step3.className = 'timeline-step concluido';
 
                     cardStatus.className = 'card-status concluido';
-                    textoStatus.style.color = '#28a745';
-                    textoStatus.innerHTML = '✅ Chamado finalizado com sucesso!';
-                    detalheStatus.innerHTML = 'Seu problema foi atendido pela equipe de TI. Obrigado!';
+                    textoStatus.style.color = '#10b981';
+                    textoStatus.innerHTML = '✅ Atendimento concluído!';
+                    detalheStatus.innerHTML = 'Sua solicitação foi finalizada com sucesso.';
 
                     chatInput.disabled = true;
-                    chatInput.placeholder = 'Chamado encerrado. Chat desativado.';
-                    
-                    // Exibe a avaliação e o botão de voltar
+                    chatInput.placeholder = 'Chamado encerrado.';
                     boxAvaliacao.style.display = 'block';
                     btnVoltar.style.display = 'block';
                 }
             }
         });
 
-        // Envio da Avaliação
         formAvaliacao.addEventListener('submit', (e) => {
             e.preventDefault();
             const ratingSelecionado = document.querySelector('input[name="rating"]:checked');
             if (!ratingSelecionado) return;
 
-            const nota = parseInt(ratingSelecionado.value);
-            const comentario = document.getElementById('comentario-avaliacao').value.trim();
-
             socket.emit('enviar_avaliacao', {
                 chamadoId: meuChamadoId,
-                nota: nota,
-                comentario: comentario
+                nota: parseInt(ratingSelecionado.value),
+                comentario: document.getElementById('comentario-avaliacao').value.trim()
             });
 
             formAvaliacao.style.display = 'none';
@@ -236,16 +246,16 @@
             formAvaliacao.reset();
             msgAvaliacaoEnviada.style.display = 'none';
             chatInput.disabled = false;
-            chatInput.placeholder = 'Digite uma mensagem para o suporte...';
+            chatInput.placeholder = 'Mensagem para o suporte...';
             chatMensagens.innerHTML = '';
-            subtitulo.textContent = 'Preencha os dados abaixo para solicitar suporte.';
+            subtitulo.textContent = 'Abra seu chamado preenchendo os dados abaixo';
             step1.className = 'timeline-step ativo';
             step2.className = 'timeline-step';
             step3.className = 'timeline-step';
             cardStatus.className = 'card-status';
-            textoStatus.style.color = '#856404';
+            textoStatus.style.color = 'var(--warning)';
             textoStatus.innerHTML = '⏳ Aguardando atendimento pelo suporte...';
-            detalheStatus.innerHTML = 'Seu chamado foi registrado com sucesso e está na fila da equipe de TI.';
+            detalheStatus.innerHTML = 'Seu chamado já está registrado na fila da equipe de TI.';
         });
     </script>
 </body>

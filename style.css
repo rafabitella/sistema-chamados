@@ -1,430 +1,396 @@
-/* Reset básico para zerar margens padrão do navegador */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary: #0f52ba;
+    --primary-hover: #0a3d8f;
+    --primary-light: #eef4ff;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --bg-body: #f4f6fb;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --radius: 14px;
+    --shadow: 0 10px 25px -5px rgba(15, 82, 186, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    background-color: var(--bg-body);
+    background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--text-main);
     display: flex;
-    flex-direction: column; /* Diz ao Flexbox para empilhar os elementos de cima para baixo */
-    align-items: center;    /* Centraliza o container e o rodapé horizontalmente na tela */
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    min-height: 100vh;
+    padding: 24px;
 }
 
 .container {
-    background-color: #ffffff;
+    background-color: var(--card-bg);
     width: 100%;
-    max-width: 600px;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 520px;
+    padding: 36px 32px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    backdrop-filter: blur(8px);
 }
 
-h1 {
-    color: #1a73e8;
-    margin-bottom: 10px;
-    font-size: 24px;
-}
-
-h2 {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 20px;
-    border-bottom: 2px solid #f0f2f5;
-    padding-bottom: 10px;
-}
-
-p {
-    margin-bottom: 20px;
-    color: #666;
-    font-size: 15px;
-}
-
-/* Estilização do Formulário */
-label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #444;
-}
-
-input[type="text"],
-textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 15px;
-    transition: border-color 0.3s;
-}
-
-input[type="text"]:focus,
-textarea:focus {
-    border-color: #1a73e8;
-    outline: none;
-}
-
-button {
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    width: 100%;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #1557b0;
-}
-
-/* Estilos específicos para o Painel */
-.chamado {
-    background-color: #fafafa;
-    border-left: 4px solid #1a73e8;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.chamado strong {
-    color: #333;
-}
-
-#alerta-novo-chamado {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    padding: 15px;
-    border-radius: 6px;
-    font-weight: bold;
-    margin-bottom: 20px;
+/* Header & Logo */
+.header-area {
     text-align: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
 }
 
-/* Rodapé do projeto */
-.rodape {
-    text-align: center;
-    margin-top: 30px;
-    font-size: 12px;
-    color: #999;
-}
-/* Botão e estado de Chamado Concluído */
-.btn-concluir {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.2s;
-    width: auto; /* Não ocupa a largura toda como o botão do form */
+.header-logo {
+    max-height: 56px;
+    margin-bottom: 12px;
+    object-fit: contain;
 }
 
-.btn-concluir:hover {
-    background-color: #218838;
+.header-area h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
 }
 
-.chamado.finalizado {
-    border-left-color: #6c757d;
-    background-color: #f1f3f5;
-    opacity: 0.7;
+.header-area p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
 }
 
-.chamado.finalizado p {
-    text-decoration: line-through;
-    color: #777;
-}
-
-.badge-concluido {
-    display: inline-block;
-    background-color: #6c757d;
-    color: white;
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    margin-top: 8px;
-    font-weight: bold;
-}
-
-/* Botões de Ação do Suporte */
-.acoes-chamado {
+/* Formulário de Abertura */
+.form-group {
+    margin-bottom: 18px;
     display: flex;
-    gap: 10px;
-    margin-top: 12px;
+    flex-direction: column;
 }
 
-.btn-atender {
-    background-color: #ff9800;
-    color: white;
-    border: none;
-    padding: 8px 14px;
+.form-group label {
     font-size: 13px;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    width: auto;
-    transition: background-color 0.2s;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 6px;
 }
 
-.btn-atender:hover {
-    background-color: #e68a00;
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.btn-concluir {
-    background-color: #28a745;
-    color: white;
+.input-icon-wrapper svg {
+    position: absolute;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    font-size: 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group textarea {
+    padding-left: 14px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(15, 82, 186, 0.12);
+}
+
+.btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+    color: #fff;
     border: none;
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 4px;
+    padding: 13px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
     cursor: pointer;
-    width: auto;
-    transition: background-color 0.2s;
-}
-
-.btn-concluir:hover {
-    background-color: #218838;
-}
-
-/* Badges de Status */
-.badge {
-    display: inline-block;
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(15, 82, 186, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
     margin-top: 8px;
 }
 
-.badge-pendente {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(15, 82, 186, 0.35);
 }
 
-.badge-analise {
-    background-color: #cce5ff;
-    color: #004085;
-    border: 1px solid #b8daff;
+.btn-primary:active {
+    transform: translateY(0);
 }
 
-.badge-concluido {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+/* Linha do Tempo Visual */
+.status-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin: 24px 0 16px 0;
+    position: relative;
 }
 
-/* Painel de Acompanhamento do Usuário (index.html) */
+.status-timeline::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background-color: var(--border-color);
+    z-index: 1;
+}
+
+.timeline-step {
+    flex: 1;
+    text-align: center;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 2;
+    padding-top: 24px;
+}
+
+.timeline-step::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+}
+
+.timeline-step.ativo {
+    color: var(--primary);
+}
+
+.timeline-step.ativo::before {
+    border-color: var(--primary);
+    background-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(15, 82, 186, 0.2);
+}
+
+.timeline-step.concluido {
+    color: var(--success);
+}
+
+.timeline-step.concluido::before {
+    border-color: var(--success);
+    background-color: var(--success);
+}
+
+/* Card de Acompanhamento */
 .card-status {
-    border-left: 5px solid #1a73e8;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 6px;
-    margin-top: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    padding: 16px 20px;
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--warning);
+    margin-top: 16px;
+    transition: all 0.3s ease;
 }
 
 .card-status.em-analise {
-    border-left-color: #ff9800;
+    border-left-color: var(--primary);
+    background-color: var(--primary-light);
 }
 
 .card-status.concluido {
-    border-left-color: #28a745;
+    border-left-color: var(--success);
+    background-color: #f0fdf4;
 }
 
-/* --- Área do Chat em Tempo Real --- */
+/* Chat */
 .chat-container {
-    margin-top: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    margin-top: 18px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     background-color: #ffffff;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
 }
 
 .chat-mensagens {
-    max-height: 220px;
+    max-height: 200px;
     min-height: 120px;
     overflow-y: auto;
-    padding: 12px;
-    background-color: #f8f9fa;
+    padding: 14px;
+    background-color: #f8fafc;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
-/* Balões de Mensagem */
 .balao-msg {
-    max-width: 80%;
-    padding: 8px 12px;
-    border-radius: 8px;
+    max-width: 82%;
+    padding: 9px 13px;
+    border-radius: 10px;
     font-size: 13px;
     line-height: 1.4;
     word-break: break-word;
-    display: flex;
-    flex-direction: column;
 }
 
 .balao-msg .autor-msg {
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 700;
     margin-bottom: 2px;
+    display: block;
 }
 
 .balao-msg .hora-msg {
     font-size: 10px;
-    align-self: flex-end;
-    margin-top: 4px;
+    text-align: right;
+    margin-top: 3px;
     opacity: 0.7;
+    display: block;
 }
 
-/* Mensagem enviada pelo Suporte / TI */
 .msg-suporte {
     align-self: flex-start;
-    background-color: #e3f2fd;
-    color: #0d47a1;
+    background-color: #e0f2fe;
+    color: #0369a1;
     border-bottom-left-radius: 2px;
 }
 
-/* Mensagem enviada pelo Usuário */
 .msg-usuario {
     align-self: flex-end;
-    background-color: #d4edda;
-    color: #155724;
+    background-color: var(--primary);
+    color: #fff;
     border-bottom-right-radius: 2px;
 }
 
-/* Formulário de Envio do Chat */
+.msg-usuario .autor-msg,
+.msg-usuario .hora-msg {
+    color: rgba(255, 255, 255, 0.85);
+}
+
 .chat-form {
     display: flex;
-    border-top: 1px solid #e0e0e0;
-    background-color: #ffffff;
+    border-top: 1px solid var(--border-color);
     padding: 8px;
     gap: 8px;
+    background: #fff;
 }
 
 .chat-input {
     flex: 1;
-    margin-bottom: 0 !important;
-    padding: 8px 12px !important;
-    font-size: 13px !important;
-    border: 1px solid #ccc !important;
-    border-radius: 4px !important;
+    padding: 9px 14px;
+    font-size: 13.5px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    outline: none;
+}
+
+.chat-input:focus {
+    border-color: var(--primary);
 }
 
 .btn-enviar-chat {
-    width: auto !important;
-    padding: 8px 16px !important;
-    font-size: 13px !important;
-    border-radius: 4px !important;
-    background-color: #1a73e8;
+    background-color: var(--primary);
     color: white;
-    cursor: pointer;
     border: none;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.btn-enviar-chat:hover {
-    background-color: #1557b0;
-}
-
-/* --- Sistema de Avaliação (Estrelas e Feedback) --- */
-.avaliacao-box {
-    margin-top: 20px;
-    padding: 16px;
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
+    padding: 9px 16px;
     border-radius: 8px;
-    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.avaliacao-box h4 {
-    margin: 0 0 10px 0;
-    color: #333;
-    font-size: 15px;
+/* Avaliação */
+.avaliacao-box {
+    margin-top: 18px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
 }
 
 .estrelas-rating {
     display: inline-flex;
     flex-direction: row-reverse;
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin: 10px 0 14px 0;
 }
 
-.estrelas-rating input {
-    display: none;
-}
-
+.estrelas-rating input { display: none; }
 .estrelas-rating label {
-    font-size: 28px;
-    color: #ccc;
+    font-size: 32px;
+    color: #cbd5e1;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: color 0.15s;
 }
 
-/* Efeito hover e seleção de estrelas da direita pra esquerda */
 .estrelas-rating input:checked ~ label,
 .estrelas-rating label:hover,
 .estrelas-rating label:hover ~ label {
-    color: #ffb703;
-}
-
-.avaliacao-box textarea {
-    width: 100%;
-    margin-bottom: 10px;
-    font-size: 13px;
+    color: #f59e0b;
 }
 
 .btn-enviar-avaliacao {
-    background-color: #ffb703;
-    color: #000;
-    border: none;
-    padding: 9px 18px;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-enviar-avaliacao:hover {
-    background-color: #fb8500;
+    background-color: #f59e0b;
     color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
 }
 
-/* Exibição da Avaliação no Painel da TI */
-.card-avaliacao-ti {
-    margin-top: 12px;
-    padding: 10px 14px;
-    background-color: #fff8e1;
-    border-left: 4px solid #ffb703;
-    border-radius: 4px;
-    font-size: 13px;
+.btn-novo-chamado {
+    background-color: #64748b;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 14px;
+    width: 100%;
 }
 
-.estrelas-visualizacao {
-    color: #ffb703;
-    font-size: 16px;
-    letter-spacing: 2px;
-    margin-bottom: 4px;
+.rodape {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
 }
