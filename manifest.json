@@ -1,0 +1,24 @@
+{
+  "name": "Chamados Grupo Le Vitta",
+  "short_name": "Le Vitta TI",
+  "description": "Central de Abertura e Suporte de Chamados de TI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f6fb",
+  "theme_color": "#0f52ba",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/imagens/levitta.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/imagens/levitta.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
