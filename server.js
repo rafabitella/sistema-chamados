@@ -22,14 +22,20 @@ app.get('/painel.html', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-    // Quando o usuário envia um novo chamado
+    // Escuta a criação de um novo chamado
     socket.on('novo_chamado', (dados) => {
         io.emit('receber_chamado', dados);
     });
 
-    // Quando o TI atualiza o status (em analise ou finalizado)
+    // Escuta a mudança de status (em analise / finalizado)
     socket.on('atualizar_status', (dados) => {
         io.emit('status_alterado', dados);
+    });
+
+    // Escuta mensagens do chat e repassa em tempo real
+    socket.on('enviar_mensagem', (dados) => {
+        // dados contém: { chamadoId, autor, texto, hora }
+        io.emit('nova_mensagem', dados);
     });
 });
 

@@ -9,10 +9,10 @@
 <body>
 
     <div class="container">
-        <h1>GRUPO LE VITTA</h1>
-        <p>Preencha os dados abaixo para solicitar suporte.</p>
+        <h1>CHAMADOS GRUPO LE VITTA</h1>
+        <p id="subtitulo">Preencha os dados abaixo para solicitar suporte.</p>
 
-        <!-- Formulário -->
+        <!-- Formulário de Abertura -->
         <form id="form-chamado">
             <label for="nome">Seu Nome:</label>
             <input type="text" id="nome" placeholder="Ex: Ivan Carlos" required>
@@ -26,17 +26,36 @@
             <button type="submit">Enviar Chamado</button>
         </form>
 
-        <!-- Acompanhamento em tempo real para o usuário -->
+        <!-- Painel de Acompanhamento do Usuário -->
         <div id="status-container" style="display: none;">
+            <div class="status-timeline">
+                <div id="step-1" class="timeline-step ativo">1. Aguardando</div>
+                <div id="step-2" class="timeline-step">2. Em Análise</div>
+                <div id="step-3" class="timeline-step">3. Concluído</div>
+            </div>
+
             <div id="card-acompanhamento" class="card-status">
                 <h3 style="margin-bottom: 8px; font-size: 16px;">Status do seu Chamado:</h3>
-                <p id="texto-status" style="margin-bottom: 5px; font-weight: bold; color: #856404;">
+                <p id="texto-status" style="margin-bottom: 5px; font-weight: bold; color: #856404; font-size: 15px;">
                     ⏳ Aguardando atendimento pelo suporte...
                 </p>
                 <p id="detalhe-status" style="font-size: 13px; color: #666; margin-bottom: 0;">
-                    Seu chamado foi registrado e já está na fila da equipe de TI.
+                    Seu chamado foi registrado com sucesso e está na fila da equipe de TI.
                 </p>
             </div>
+
+            <!-- Chat em Tempo Real com o Suporte -->
+            <div class="chat-container">
+                <div class="chat-mensagens" id="chat-mensagens">
+                    <!-- Mensagens aparecem aqui -->
+                </div>
+                <form class="chat-form" id="chat-form">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Digite uma mensagem para o suporte..." required autocomplete="off">
+                    <button type="submit" class="btn-enviar-chat">Enviar</button>
+                </form>
+            </div>
+
+            <button id="btn-voltar" class="btn-novo-chamado" style="display: none;">Abrir Novo Chamado</button>
         </div>
     </div>
 
@@ -48,22 +67,33 @@
     <script>
         const socket = io();
         const form = document.getElementById('form-chamado');
+        const subtitulo = document.getElementById('subtitulo');
         const statusContainer = document.getElementById('status-container');
         const cardStatus = document.getElementById('card-acompanhamento');
         const textoStatus = document.getElementById('texto-status');
         const detalheStatus = document.getElementById('detalhe-status');
+        const step1 = document.getElementById('step-1');
+        const step2 = document.getElementById('step-2');
+        const step3 = document.getElementById('step-3');
+        const btnVoltar = document.getElementById('btn-voltar');
+
+        // Elementos do Chat
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMensagens = document.getElementById('chat-mensagens');
 
         let meuChamadoId = null;
+        let meuNome = '';
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // Gera ID único para identificar o chamado
             meuChamadoId = 'chamado_' + Date.now();
+            meuNome = document.getElementById('nome').value;
 
             const chamado = {
                 id: meuChamadoId,
-                nome: document.getElementById('nome').value,
+                nome: meuNome,
                 setor: document.getElementById('setor').value,
                 descricao: document.getElementById('descricao').value,
                 hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -71,26 +101,108 @@
 
             socket.emit('novo_chamado', chamado);
 
-            // Esconde o formulário e mostra o cartão de status
             form.style.display = 'none';
+            subtitulo.textContent = 'Acompanhe o andamento da sua solicitação abaixo:';
             statusContainer.style.display = 'block';
+
+            // Mensagem de boas-vindas inicial no chat
+            adicionarMensagemChat({
+                autor: 'Sistema',
+                texto: 'Chat aberto. Envie mais detalhes ou dúvidas aqui.',
+                hora: chamado.hora,
+                tipo: 'msg-suporte'
+            });
         });
 
-        // Escuta atualizações de status vindas do TI
+        // Envio de mensagem pelo usuário
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const texto = chatInput.value.trim();
+            if (!texto) return;
+
+            const dadosMsg = {
+                chamadoId: meuChamadoId,
+                autor: meuNome,
+                tipoOrigem: 'usuario',
+                texto: texto,
+                hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            socket.emit('enviar_mensagem', dadosMsg);
+            chatInput.value = '';
+        });
+
+        // Recepção de mensagens do chat em tempo real
+        socket.on('nova_mensagem', (msg) => {
+            if (msg.chamadoId === meuChamadoId) {
+                const tipoClasse = msg.tipoOrigem === 'usuario' ? 'msg-usuario' : 'msg-suporte';
+                adicionarMensagemChat({
+                    autor: msg.autor,
+                    texto: msg.texto,
+                    hora: msg.hora,
+                    tipo: tipoClasse
+                });
+            }
+        });
+
+        function adicionarMensagemChat({ autor, texto, hora, tipo }) {
+            const balao = document.createElement('div');
+            balao.className = `balao-msg ${tipo}`;
+            balao.innerHTML = `
+                <span class="autor-msg">${autor}</span>
+                <span>${texto}</span>
+                <span class="hora-msg">${hora}</span>
+            `;
+            chatMensagens.appendChild(balao);
+            chatMensagens.scrollTop = chatMensagens.scrollHeight;
+        }
+
+        // Escuta atualizações de status
         socket.on('status_alterado', (dados) => {
             if (dados.id === meuChamadoId) {
                 if (dados.status === 'em_analise') {
+                    step1.className = 'timeline-step concluido';
+                    step2.className = 'timeline-step ativo';
+                    step3.className = 'timeline-step';
+
                     cardStatus.className = 'card-status em-analise';
-                    textoStatus.style.color = '#004085';
-                    textoStatus.innerHTML = '🔍 Seu chamado está em análise!';
-                    detalheStatus.innerHTML = 'Um técnico do TI assumiu a sua solicitação e já está trabalhando na solução.';
+                    textoStatus.style.color = '#ff9800';
+                    textoStatus.innerHTML = '⚙️ Chamado em andamento!';
+                    detalheStatus.innerHTML = 'A equipe de TI já assumiu seu chamado e está realizando o atendimento.';
                 } else if (dados.status === 'concluido') {
+                    step1.className = 'timeline-step concluido';
+                    step2.className = 'timeline-step concluido';
+                    step3.className = 'timeline-step concluido';
+
                     cardStatus.className = 'card-status concluido';
-                    textoStatus.style.color = '#155724';
-                    textoStatus.innerHTML = '✅ Chamado encerrado!';
-                    detalheStatus.innerHTML = 'O suporte finalizou o atendimento deste chamado. Obrigado!';
+                    textoStatus.style.color = '#28a745';
+                    textoStatus.innerHTML = '✅ Chamado finalizado com sucesso!';
+                    detalheStatus.innerHTML = 'Seu problema foi atendido pela equipe de TI. Obrigado!';
+
+                    // Desabilita o envio de novas mensagens no chat
+                    chatInput.disabled = true;
+                    chatInput.placeholder = 'Chamado encerrado. Chat desativado.';
+                    btnVoltar.style.display = 'block';
                 }
             }
+        });
+
+        btnVoltar.addEventListener('click', () => {
+            form.reset();
+            form.style.display = 'block';
+            statusContainer.style.display = 'none';
+            btnVoltar.style.display = 'none';
+            chatInput.disabled = false;
+            chatInput.placeholder = 'Digite uma mensagem para o suporte...';
+            chatMensagens.innerHTML = '';
+            subtitulo.textContent = 'Preencha os dados abaixo para solicitar suporte.';
+            step1.className = 'timeline-step ativo';
+            step2.className = 'timeline-step';
+            step3.className = 'timeline-step';
+            cardStatus.className = 'card-status';
+            textoStatus.style.color = '#856404';
+            textoStatus.innerHTML = '⏳ Aguardando atendimento pelo suporte...';
+            detalheStatus.innerHTML = 'Seu chamado foi registrado com sucesso e está na fila da equipe de TI.';
         });
     </script>
 </body>
