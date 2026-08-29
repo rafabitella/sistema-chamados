@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Gradiente de Fundo do App Icon -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+
+    <!-- Gradiente Vermelho Vibrante -->
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+
+    <!-- Gradiente Azul Interno -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#93c5fd"/>
+      <stop offset="100%" stop-color="#60a5fa"/>
+    </linearGradient>
+
+    <!-- Sombra Suave dos Elementos -->
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#022e51" flood-opacity="0.35"/>
+    </filter>
+
+    <!-- Brilho Interno Suave na Borda do Ícone -->
+    <linearGradient id="strokeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base com Formato Squircle do App -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bgGrad)" />
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="none" stroke="url(#strokeGrad)" stroke-width="3" />
+
+  <!-- Grupo com os Símbolos Vetoriais -->
+  <g filter="url(#softShadow)">
+    
+    <!-- Elemento 'T' Superior Direito -->
+    <path d="M 276 108 
+             H 432 
+             A 20 20 0 0 1 452 128 
+             V 156 
+             A 20 20 0 0 1 432 176 
+             H 408 
+             V 214 
+             A 12 12 0 0 1 396 226 
+             H 332 
+             A 12 12 0 0 1 320 214 
+             V 176 
+             H 276 
+             A 20 20 0 0 1 256 156 
+             V 128 
+             A 20 20 0 0 1 276 108 Z" 
+          fill="url(#blueGrad)" />
+
+    <!-- Elemento Curvo 'U / Conector' Inferior Vermelho -->
+    <path d="M 52 108 
+             H 196 
+             A 20 20 0 0 1 216 128 
+             V 156 
+             A 20 20 0 0 1 196 176 
+             H 162 
+             V 224 
+             C 162 278 206 322 260 322 
+             C 314 322 358 278 358 224 
+             H 432 
+             A 16 16 0 0 1 448 240 
+             C 448 344 364 428 260 428 
+             C 156 428 72 344 72 240 
+             V 176 
+             H 52 
+             A 20 20 0 0 1 32 156 
+             V 128 
+             A 20 20 0 0 1 52 108 Z" 
+          fill="url(#redGrad)" />
+  </g>
+</svg>
