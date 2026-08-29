@@ -346,3 +346,85 @@ button:hover {
 .btn-enviar-chat:hover {
     background-color: #1557b0;
 }
+
+/* --- Sistema de Avaliação (Estrelas e Feedback) --- */
+.avaliacao-box {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.avaliacao-box h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 15px;
+}
+
+.estrelas-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.estrelas-rating input {
+    display: none;
+}
+
+.estrelas-rating label {
+    font-size: 28px;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+/* Efeito hover e seleção de estrelas da direita pra esquerda */
+.estrelas-rating input:checked ~ label,
+.estrelas-rating label:hover,
+.estrelas-rating label:hover ~ label {
+    color: #ffb703;
+}
+
+.avaliacao-box textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+.btn-enviar-avaliacao {
+    background-color: #ffb703;
+    color: #000;
+    border: none;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-enviar-avaliacao:hover {
+    background-color: #fb8500;
+    color: #fff;
+}
+
+/* Exibição da Avaliação no Painel da TI */
+.card-avaliacao-ti {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background-color: #fff8e1;
+    border-left: 4px solid #ffb703;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.estrelas-visualizacao {
+    color: #ffb703;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}

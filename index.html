@@ -44,15 +44,32 @@
                 </p>
             </div>
 
-            <!-- Chat em Tempo Real com o Suporte -->
+            <!-- Chat em Tempo Real -->
             <div class="chat-container">
-                <div class="chat-mensagens" id="chat-mensagens">
-                    <!-- Mensagens aparecem aqui -->
-                </div>
+                <div class="chat-mensagens" id="chat-mensagens"></div>
                 <form class="chat-form" id="chat-form">
                     <input type="text" class="chat-input" id="chat-input" placeholder="Digite uma mensagem para o suporte..." required autocomplete="off">
                     <button type="submit" class="btn-enviar-chat">Enviar</button>
                 </form>
+            </div>
+
+            <!-- Box de Avaliação (surge após conclusão) -->
+            <div id="box-avaliacao" class="avaliacao-box" style="display: none;">
+                <h4>Como você avalia este atendimento?</h4>
+                <form id="form-avaliacao">
+                    <div class="estrelas-rating">
+                        <input type="radio" id="estrela5" name="rating" value="5" required><label for="estrela5">★</label>
+                        <input type="radio" id="estrela4" name="rating" value="4"><label for="estrela4">★</label>
+                        <input type="radio" id="estrela3" name="rating" value="3"><label for="estrela3">★</label>
+                        <input type="radio" id="estrela2" name="rating" value="2"><label for="estrela2">★</label>
+                        <input type="radio" id="estrela1" name="rating" value="1"><label for="estrela1">★</label>
+                    </div>
+                    <textarea id="comentario-avaliacao" rows="2" placeholder="Deixe um comentário sobre o atendimento (opcional)..."></textarea>
+                    <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
+                </form>
+                <p id="msg-avaliacao-enviada" style="display: none; color: #28a745; font-weight: bold; margin-top: 10px;">
+                    Obrigado pelo seu feedback! ⭐
+                </p>
             </div>
 
             <button id="btn-voltar" class="btn-novo-chamado" style="display: none;">Abrir Novo Chamado</button>
@@ -77,10 +94,15 @@
         const step3 = document.getElementById('step-3');
         const btnVoltar = document.getElementById('btn-voltar');
 
-        // Elementos do Chat
+        // Chat
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
         const chatMensagens = document.getElementById('chat-mensagens');
+
+        // Avaliação
+        const boxAvaliacao = document.getElementById('box-avaliacao');
+        const formAvaliacao = document.getElementById('form-avaliacao');
+        const msgAvaliacaoEnviada = document.getElementById('msg-avaliacao-enviada');
 
         let meuChamadoId = null;
         let meuNome = '';
@@ -105,7 +127,6 @@
             subtitulo.textContent = 'Acompanhe o andamento da sua solicitação abaixo:';
             statusContainer.style.display = 'block';
 
-            // Mensagem de boas-vindas inicial no chat
             adicionarMensagemChat({
                 autor: 'Sistema',
                 texto: 'Chat aberto. Envie mais detalhes ou dúvidas aqui.',
@@ -114,7 +135,6 @@
             });
         });
 
-        // Envio de mensagem pelo usuário
         chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const texto = chatInput.value.trim();
@@ -132,7 +152,6 @@
             chatInput.value = '';
         });
 
-        // Recepção de mensagens do chat em tempo real
         socket.on('nova_mensagem', (msg) => {
             if (msg.chamadoId === meuChamadoId) {
                 const tipoClasse = msg.tipoOrigem === 'usuario' ? 'msg-usuario' : 'msg-suporte';
@@ -157,7 +176,6 @@
             chatMensagens.scrollTop = chatMensagens.scrollHeight;
         }
 
-        // Escuta atualizações de status
         socket.on('status_alterado', (dados) => {
             if (dados.id === meuChamadoId) {
                 if (dados.status === 'em_analise') {
@@ -179,12 +197,33 @@
                     textoStatus.innerHTML = '✅ Chamado finalizado com sucesso!';
                     detalheStatus.innerHTML = 'Seu problema foi atendido pela equipe de TI. Obrigado!';
 
-                    // Desabilita o envio de novas mensagens no chat
                     chatInput.disabled = true;
                     chatInput.placeholder = 'Chamado encerrado. Chat desativado.';
+                    
+                    // Exibe a avaliação e o botão de voltar
+                    boxAvaliacao.style.display = 'block';
                     btnVoltar.style.display = 'block';
                 }
             }
+        });
+
+        // Envio da Avaliação
+        formAvaliacao.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const ratingSelecionado = document.querySelector('input[name="rating"]:checked');
+            if (!ratingSelecionado) return;
+
+            const nota = parseInt(ratingSelecionado.value);
+            const comentario = document.getElementById('comentario-avaliacao').value.trim();
+
+            socket.emit('enviar_avaliacao', {
+                chamadoId: meuChamadoId,
+                nota: nota,
+                comentario: comentario
+            });
+
+            formAvaliacao.style.display = 'none';
+            msgAvaliacaoEnviada.style.display = 'block';
         });
 
         btnVoltar.addEventListener('click', () => {
@@ -192,6 +231,10 @@
             form.style.display = 'block';
             statusContainer.style.display = 'none';
             btnVoltar.style.display = 'none';
+            boxAvaliacao.style.display = 'none';
+            formAvaliacao.style.display = 'block';
+            formAvaliacao.reset();
+            msgAvaliacaoEnviada.style.display = 'none';
             chatInput.disabled = false;
             chatInput.placeholder = 'Digite uma mensagem para o suporte...';
             chatMensagens.innerHTML = '';

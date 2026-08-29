@@ -115,6 +115,9 @@
                     </form>
                 </div>
 
+                <!-- Área reservada para a Avaliação -->
+                <div class="area-avaliacao" id="avaliacao-${chamado.id}"></div>
+
                 <div class="acoes-chamado">
                     <button class="btn-atender">Atender Chamado</button>
                     <button class="btn-concluir">Finalizar Chamado</button>
@@ -127,7 +130,6 @@
             const formChat = card.querySelector(`#form-chat-${chamado.id}`);
             const inputChat = formChat.querySelector('.chat-input');
 
-            // Enviar mensagem de resposta do suporte
             formChat.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const texto = inputChat.value.trim();
@@ -145,7 +147,6 @@
                 inputChat.value = '';
             });
 
-            // Ação ao clicar em "Atender"
             btnAtender.addEventListener('click', () => {
                 badge.className = 'badge badge-analise';
                 badge.textContent = 'Em Andamento';
@@ -153,7 +154,6 @@
                 socket.emit('atualizar_status', { id: chamado.id, status: 'em_analise' });
             });
 
-            // Ação ao clicar em "Finalizar"
             btnConcluir.addEventListener('click', () => {
                 badge.className = 'badge badge-concluido';
                 badge.textContent = 'Resolvido';
@@ -167,7 +167,6 @@
             listaChamados.prepend(card);
         });
 
-        // Escuta mensagens recebidas no chat
         socket.on('nova_mensagem', (msg) => {
             const containerMsgs = document.getElementById(`chat-msgs-${msg.chamadoId}`);
             if (containerMsgs) {
@@ -181,6 +180,22 @@
                 `;
                 containerMsgs.appendChild(balao);
                 containerMsgs.scrollTop = containerMsgs.scrollHeight;
+            }
+        });
+
+        // Exibe a avaliação recebida em tempo real
+        socket.on('nova_avaliacao', (dados) => {
+            const containerAvaliacao = document.getElementById(`avaliacao-${dados.chamadoId}`);
+            if (containerAvaliacao) {
+                const estrelas = '★'.repeat(dados.nota) + '☆'.repeat(5 - dados.nota);
+                containerAvaliacao.innerHTML = `
+                    <div class="card-avaliacao-ti">
+                        <div class="estrelas-visualizacao">${estrelas} (${dados.nota}/5)</div>
+                        <p style="margin: 0; color: #444;">
+                            ${dados.comentario ? `"${dados.comentario}"` : '<em>Sem comentário adicional.</em>'}
+                        </p>
+                    </div>
+                `;
             }
         });
     </script>
