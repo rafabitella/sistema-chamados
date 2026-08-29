@@ -60,6 +60,10 @@ app.get('/painel.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'painel.html'));
 });
 
+app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'imagens', 'favicon.png'));
+});
+
 io.on('connection', (socket) => {
     // Ao carregar o painel, busca todos os chamados e suas mensagens
     socket.on('carregar_historico', () => {
