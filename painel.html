@@ -17,7 +17,7 @@
 
         <h2>Chamados Recebidos</h2>
         <div id="lista-chamados">
-            <p>Nenhum chamado no momento. Aguardando...</p>
+            <p>Carregando histórico de chamados...</p>
         </div>
     </div>
 
@@ -75,32 +75,56 @@
             }
         }
 
-        socket.on('receber_chamado', (chamado) => {
-            tocarSomNotificacao();
+        function criarCardChamado(chamado) {
+            const card = document.createElement('div');
+            card.className = `chamado ${chamado.status === 'concluido' ? 'finalizado' : ''}`;
+            card.id = chamado.id;
 
-            if (primeiroChamado) {
-                listaChamados.innerHTML = '';
-                primeiroChamado = false;
+            let badgeHtml = '<span class="badge badge-pendente">Aguardando Suporte</span>';
+            if (chamado.status === 'em_analise') {
+                badgeHtml = '<span class="badge badge-analise">Em Andamento</span>';
+            } else if (chamado.status === 'concluido') {
+                badgeHtml = '<span class="badge badge-concluido">Resolvido</span>';
             }
 
-            alerta.style.display = 'block';
-            setTimeout(() => {
-                alerta.style.display = 'none';
-            }, 5000);
+            let acoesHtml = '';
+            if (chamado.status === 'aguardando') {
+                acoesHtml = `
+                    <div class="acoes-chamado">
+                        <button class="btn-atender">Atender Chamado</button>
+                        <button class="btn-concluir">Finalizar Chamado</button>
+                    </div>
+                `;
+            } else if (chamado.status === 'em_analise') {
+                acoesHtml = `
+                    <div class="acoes-chamado">
+                        <button class="btn-concluir">Finalizar Chamado</button>
+                    </div>
+                `;
+            }
 
-            const card = document.createElement('div');
-            card.className = 'chamado';
-            card.id = chamado.id;
+            let avaliacaoHtml = '';
+            if (chamado.nota) {
+                const estrelas = '★'.repeat(chamado.nota) + '☆'.repeat(5 - chamado.nota);
+                avaliacaoHtml = `
+                    <div class="card-avaliacao-ti">
+                        <div class="estrelas-visualizacao">${estrelas} (${chamado.nota}/5)</div>
+                        <p style="margin: 0; color: #444;">
+                            ${chamado.comentario ? `"${chamado.comentario}"` : '<em>Sem comentário adicional.</em>'}
+                        </p>
+                    </div>
+                `;
+            }
+
             card.innerHTML = `
                 <div class="conteudo-chamado">
                     <p><strong>Horário:</strong> ${chamado.hora}</p>
                     <p><strong>Nome:</strong> ${chamado.nome}</p>
                     <p><strong>Setor:</strong> ${chamado.setor}</p>
                     <p><strong>Problema:</strong> ${chamado.descricao}</p>
-                    <div><span class="badge badge-pendente">Aguardando Suporte</span></div>
+                    <div>${badgeHtml}</div>
                 </div>
 
-                <!-- Chat do Chamado -->
                 <div class="chat-container">
                     <div class="chat-mensagens" id="chat-msgs-${chamado.id}">
                         <div class="balao-msg msg-suporte">
@@ -110,23 +134,18 @@
                         </div>
                     </div>
                     <form class="chat-form" id="form-chat-${chamado.id}">
-                        <input type="text" class="chat-input" placeholder="Responder para ${chamado.nome}..." required autocomplete="off">
-                        <button type="submit" class="btn-enviar-chat">Responder</button>
+                        <input type="text" class="chat-input" placeholder="${chamado.status === 'concluido' ? 'Chamado finalizado.' : `Responder para ${chamado.nome}...`}" ${chamado.status === 'concluido' ? 'disabled' : ''} required autocomplete="off">
+                        <button type="submit" class="btn-enviar-chat" ${chamado.status === 'concluido' ? 'disabled' : ''}>Responder</button>
                     </form>
                 </div>
 
-                <!-- Área reservada para a Avaliação -->
-                <div class="area-avaliacao" id="avaliacao-${chamado.id}"></div>
-
-                <div class="acoes-chamado">
-                    <button class="btn-atender">Atender Chamado</button>
-                    <button class="btn-concluir">Finalizar Chamado</button>
-                </div>
+                <div class="area-avaliacao" id="avaliacao-${chamado.id}">${avaliacaoHtml}</div>
+                ${acoesHtml}
             `;
 
+            // Eventos dos botões
             const btnAtender = card.querySelector('.btn-atender');
             const btnConcluir = card.querySelector('.btn-concluir');
-            const badge = card.querySelector('.badge');
             const formChat = card.querySelector(`#form-chat-${chamado.id}`);
             const inputChat = formChat.querySelector('.chat-input');
 
@@ -147,28 +166,88 @@
                 inputChat.value = '';
             });
 
-            btnAtender.addEventListener('click', () => {
-                badge.className = 'badge badge-analise';
-                badge.textContent = 'Em Andamento';
-                btnAtender.remove();
-                socket.emit('atualizar_status', { id: chamado.id, status: 'em_analise' });
+            if (btnAtender) {
+                btnAtender.addEventListener('click', () => {
+                    const badge = card.querySelector('.badge');
+                    badge.className = 'badge badge-analise';
+                    badge.textContent = 'Em Andamento';
+                    btnAtender.remove();
+                    socket.emit('atualizar_status', { id: chamado.id, status: 'em_analise' });
+                });
+            }
+
+            if (btnConcluir) {
+                btnConcluir.addEventListener('click', () => {
+                    const badge = card.querySelector('.badge');
+                    badge.className = 'badge badge-concluido';
+                    badge.textContent = 'Resolvido';
+                    card.classList.add('finalizado');
+                    const containerAcoes = card.querySelector('.acoes-chamado');
+                    if (containerAcoes) containerAcoes.remove();
+                    inputChat.disabled = true;
+                    inputChat.placeholder = 'Chamado finalizado.';
+                    socket.emit('atualizar_status', { id: chamado.id, status: 'concluido' });
+                });
+            }
+
+            return card;
+        }
+
+        // Carrega todo o histórico gravado no banco SQLite
+        socket.on('connect', () => {
+            socket.emit('carregar_historico');
+        });
+
+        socket.on('historico_carregado', ({ chamados, mensagens }) => {
+            listaChamados.innerHTML = '';
+            if (!chamados || chamados.length === 0) {
+                listaChamados.innerHTML = '<p>Nenhum chamado registrado no banco de dados.</p>';
+                primeiroChamado = true;
+                return;
+            }
+
+            primeiroChamado = false;
+            chamados.forEach(ch => {
+                const card = criarCardChamado(ch);
+                listaChamados.appendChild(card);
             });
 
-            btnConcluir.addEventListener('click', () => {
-                badge.className = 'badge badge-concluido';
-                badge.textContent = 'Resolvido';
-                card.classList.add('finalizado');
-                card.querySelector('.acoes-chamado').remove();
-                inputChat.disabled = true;
-                inputChat.placeholder = 'Chamado finalizado.';
-                socket.emit('atualizar_status', { id: chamado.id, status: 'concluido' });
+            // Insere as mensagens salvas nos respectivos chats
+            mensagens.forEach(msg => {
+                const containerMsgs = document.getElementById(`chat-msgs-${msg.chamado_id}`);
+                if (containerMsgs) {
+                    const tipoClasse = msg.tipoOrigem === 'suporte' ? 'msg-suporte' : 'msg-usuario';
+                    const balao = document.createElement('div');
+                    balao.className = `balao-msg ${tipoClasse}`;
+                    balao.innerHTML = `
+                        <span class="autor-msg">${msg.autor}</span>
+                        <span>${msg.texto}</span>
+                        <span class="hora-msg">${msg.hora}</span>
+                    `;
+                    containerMsgs.appendChild(balao);
+                    containerMsgs.scrollTop = containerMsgs.scrollHeight;
+                }
             });
+        });
 
+        // Quando chega um novo chamado em tempo real
+        socket.on('receber_chamado', (chamado) => {
+            tocarSomNotificacao();
+
+            if (primeiroChamado) {
+                listaChamados.innerHTML = '';
+                primeiroChamado = false;
+            }
+
+            alerta.style.display = 'block';
+            setTimeout(() => { alerta.style.display = 'none'; }, 5000);
+
+            const card = criarCardChamado(chamado);
             listaChamados.prepend(card);
         });
 
         socket.on('nova_mensagem', (msg) => {
-            const containerMsgs = document.getElementById(`chat-msgs-${msg.chamadoId}`);
+            const containerMsgs = document.getElementById(`chat-msgs-${msg.chamadoId || msg.chamado_id}`);
             if (containerMsgs) {
                 const tipoClasse = msg.tipoOrigem === 'suporte' ? 'msg-suporte' : 'msg-usuario';
                 const balao = document.createElement('div');
@@ -183,7 +262,6 @@
             }
         });
 
-        // Exibe a avaliação recebida em tempo real
         socket.on('nova_avaliacao', (dados) => {
             const containerAvaliacao = document.getElementById(`avaliacao-${dados.chamadoId}`);
             if (containerAvaliacao) {
