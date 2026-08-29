@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/SITE CHAMADO/favicon.png",
+      "src": "/site-chamado/favicon.png",
       "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"

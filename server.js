@@ -50,13 +50,13 @@ db.serialize(() => {
 // Arquivos estáticos
 app.use(express.static(path.join(__dirname)));
 
-// Função auxiliar para localizar e servir a imagem onde quer que ela esteja
+// Função universal para localizar e entregar o favicon em qualquer pasta
 function servirFavicon(res) {
     const caminhosPossiveis = [
+        path.join(__dirname, 'site-chamado', 'favicon.png'),
+        path.join(__dirname, 'site-chamado', 'imagens', 'favicon.png'),
         path.join(__dirname, 'favicon.png'),
-        path.join(__dirname, 'imagens', 'favicon.png'),
-        path.join(__dirname, 'SITE CHAMADO', 'favicon.png'),
-        path.join(__dirname, 'SITE CHAMADO', 'imagens', 'favicon.png')
+        path.join(__dirname, 'imagens', 'favicon.png')
     ];
 
     for (const caminho of caminhosPossiveis) {
@@ -80,12 +80,11 @@ app.get('/painel.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'painel.html'));
 });
 
-// Rotas universais para cobrir todas as chamadas de favicon
+// Rotas para Favicons (sem duplicatas)
 app.get('/favicon.ico', (req, res) => servirFavicon(res));
 app.get('/favicon.png', (req, res) => servirFavicon(res));
+app.get('/site-chamado/favicon.png', (req, res) => servirFavicon(res));
 app.get('/imagens/favicon.png', (req, res) => servirFavicon(res));
-app.get('/SITE%20CHAMADO/favicon.png', (req, res) => servirFavicon(res));
-app.get('/SITE CHAMADO/favicon.png', (req, res) => servirFavicon(res));
 
 // WebSocket
 io.on('connection', (socket) => {
