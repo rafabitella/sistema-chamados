@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Chamados (Admin)</title>
     
-    <!-- Favicon PNG -->
-    <link rel="icon" type="image/png" href="imagens/favicon.png">
-    <link rel="shortcut icon" type="image/png" href="imagens/favicon.png">
-    <link rel="apple-touch-icon" href="imagens/favicon.png">
+    <!-- Favicon PNG com caminho absoluto e versão de cache -->
+    <link rel="icon" type="image/png" href="/imagens/favicon.png?v=3">
+    <link rel="shortcut icon" type="image/png" href="/imagens/favicon.png?v=3">
+    <link rel="apple-touch-icon" href="/imagens/favicon.png?v=3">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>Painel de Chamados - TI</h1>
+        <div class="header-area" style="text-align: center; margin-bottom: 20px;">
+            <img src="/imagens/favicon.png" alt="Grupo Le Vitta" class="header-logo" onerror="this.style.display='none'" style="max-height: 60px; margin-bottom: 10px;">
+            <h1>Painel de Chamados - TI</h1>
+        </div>
         
         <div id="alerta-novo-chamado" style="display: none; background-color: #ffeb3b; padding: 10px; border-radius: 5px; font-weight: bold; margin-bottom: 20px;">
             🔔 Novo chamado recebido!
@@ -149,7 +152,6 @@
                 ${acoesHtml}
             `;
 
-            // Eventos dos botões
             const btnAtender = card.querySelector('.btn-atender');
             const btnConcluir = card.querySelector('.btn-concluir');
             const formChat = card.querySelector(`#form-chat-${chamado.id}`);
@@ -199,7 +201,6 @@
             return card;
         }
 
-        // Carrega todo o histórico gravado no banco SQLite
         socket.on('connect', () => {
             socket.emit('carregar_historico');
         });
@@ -218,7 +219,6 @@
                 listaChamados.appendChild(card);
             });
 
-            // Insere as mensagens salvas nos respectivos chats
             mensagens.forEach(msg => {
                 const containerMsgs = document.getElementById(`chat-msgs-${msg.chamado_id}`);
                 if (containerMsgs) {
@@ -236,7 +236,6 @@
             });
         });
 
-        // Quando chega um novo chamado em tempo real
         socket.on('receber_chamado', (chamado) => {
             tocarSomNotificacao();
 
