@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -46,8 +47,27 @@ db.serialize(() => {
     `);
 });
 
+// Arquivos estáticos
 app.use(express.static(path.join(__dirname)));
 
+// Função auxiliar para localizar e servir a imagem onde quer que ela esteja
+function servirFavicon(res) {
+    const caminhosPossiveis = [
+        path.join(__dirname, 'favicon.png'),
+        path.join(__dirname, 'imagens', 'favicon.png'),
+        path.join(__dirname, 'SITE CHAMADO', 'favicon.png'),
+        path.join(__dirname, 'SITE CHAMADO', 'imagens', 'favicon.png')
+    ];
+
+    for (const caminho of caminhosPossiveis) {
+        if (fs.existsSync(caminho)) {
+            return res.sendFile(caminho);
+        }
+    }
+    return res.status(404).send('Favicon não encontrado');
+}
+
+// Rotas de Páginas
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -60,10 +80,14 @@ app.get('/painel.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'painel.html'));
 });
 
-app.get('/favicon.ico', (req, res) => {
-    res.sendFile(path.join(__dirname, 'imagens', 'favicon.png'));
-});
+// Rotas universais para cobrir todas as chamadas de favicon
+app.get('/favicon.ico', (req, res) => servirFavicon(res));
+app.get('/favicon.png', (req, res) => servirFavicon(res));
+app.get('/imagens/favicon.png', (req, res) => servirFavicon(res));
+app.get('/SITE%20CHAMADO/favicon.png', (req, res) => servirFavicon(res));
+app.get('/SITE CHAMADO/favicon.png', (req, res) => servirFavicon(res));
 
+// WebSocket
 io.on('connection', (socket) => {
     // Ao carregar o painel, busca todos os chamados e suas mensagens
     socket.on('carregar_historico', () => {
