@@ -1,18 +1,17 @@
 {
-  "name": "site-chamado",
+  "name": "sistema-chamados",
   "version": "1.0.0",
-  "description": "Central de Chamados Le Vitta TI",
+  "description": "Central de Chamados Grupo Le Vitta",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "Rafael Bitella",
-  "license": "ISC",
-  "type": "commonjs",
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
-    "express": "^5.2.1",
-    "socket.io": "^4.8.3",
-    "sqlite3": "^6.0.1"
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "sqlite3": "^5.1.7"
   }
 }
