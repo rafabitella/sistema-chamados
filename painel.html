@@ -32,12 +32,8 @@
         let audioCtx = null;
 
         function getAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new AudioContext();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             return audioCtx;
         }
 
@@ -103,6 +99,22 @@
                     <p><strong>Problema:</strong> ${chamado.descricao}</p>
                     <div><span class="badge badge-pendente">Aguardando Suporte</span></div>
                 </div>
+
+                <!-- Chat do Chamado -->
+                <div class="chat-container">
+                    <div class="chat-mensagens" id="chat-msgs-${chamado.id}">
+                        <div class="balao-msg msg-suporte">
+                            <span class="autor-msg">Sistema</span>
+                            <span>Chat do chamado iniciado.</span>
+                            <span class="hora-msg">${chamado.hora}</span>
+                        </div>
+                    </div>
+                    <form class="chat-form" id="form-chat-${chamado.id}">
+                        <input type="text" class="chat-input" placeholder="Responder para ${chamado.nome}..." required autocomplete="off">
+                        <button type="submit" class="btn-enviar-chat">Responder</button>
+                    </form>
+                </div>
+
                 <div class="acoes-chamado">
                     <button class="btn-atender">Atender Chamado</button>
                     <button class="btn-concluir">Finalizar Chamado</button>
@@ -112,27 +124,64 @@
             const btnAtender = card.querySelector('.btn-atender');
             const btnConcluir = card.querySelector('.btn-concluir');
             const badge = card.querySelector('.badge');
+            const formChat = card.querySelector(`#form-chat-${chamado.id}`);
+            const inputChat = formChat.querySelector('.chat-input');
 
-            // Quando o TI clica em "Atender"
+            // Enviar mensagem de resposta do suporte
+            formChat.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const texto = inputChat.value.trim();
+                if (!texto) return;
+
+                const dadosMsg = {
+                    chamadoId: chamado.id,
+                    autor: 'Suporte TI',
+                    tipoOrigem: 'suporte',
+                    texto: texto,
+                    hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                socket.emit('enviar_mensagem', dadosMsg);
+                inputChat.value = '';
+            });
+
+            // Ação ao clicar em "Atender"
             btnAtender.addEventListener('click', () => {
                 badge.className = 'badge badge-analise';
-                badge.textContent = 'Em Análise';
-                btnAtender.remove(); // Remove o botão de atender, mantém só o de finalizar
-
+                badge.textContent = 'Em Andamento';
+                btnAtender.remove();
                 socket.emit('atualizar_status', { id: chamado.id, status: 'em_analise' });
             });
 
-            // Quando o TI clica em "Finalizar"
+            // Ação ao clicar em "Finalizar"
             btnConcluir.addEventListener('click', () => {
                 badge.className = 'badge badge-concluido';
                 badge.textContent = 'Resolvido';
                 card.classList.add('finalizado');
-                card.querySelector('.acoes-chamado').remove(); // Remove todos os botões
-
+                card.querySelector('.acoes-chamado').remove();
+                inputChat.disabled = true;
+                inputChat.placeholder = 'Chamado finalizado.';
                 socket.emit('atualizar_status', { id: chamado.id, status: 'concluido' });
             });
 
             listaChamados.prepend(card);
+        });
+
+        // Escuta mensagens recebidas no chat
+        socket.on('nova_mensagem', (msg) => {
+            const containerMsgs = document.getElementById(`chat-msgs-${msg.chamadoId}`);
+            if (containerMsgs) {
+                const tipoClasse = msg.tipoOrigem === 'suporte' ? 'msg-suporte' : 'msg-usuario';
+                const balao = document.createElement('div');
+                balao.className = `balao-msg ${tipoClasse}`;
+                balao.innerHTML = `
+                    <span class="autor-msg">${msg.autor}</span>
+                    <span>${msg.texto}</span>
+                    <span class="hora-msg">${msg.hora}</span>
+                `;
+                containerMsgs.appendChild(balao);
+                containerMsgs.scrollTop = containerMsgs.scrollHeight;
+            }
         });
     </script>
 </body>
